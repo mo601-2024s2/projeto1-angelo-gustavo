@@ -8,7 +8,7 @@
 
 int main() {
 
-    read_elf("../programas/000.main.riscv");
+    read_hex("../test/034.add.hex");
 
 
     return 0;
