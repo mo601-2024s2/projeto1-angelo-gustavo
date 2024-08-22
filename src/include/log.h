@@ -10,6 +10,7 @@
 */
 
 #include <stdint.h>
+#define MAX_INST_SIZE 64
 
 typedef struct {
     uint32_t pc;
@@ -17,7 +18,7 @@ typedef struct {
     uint32_t rd;
     uint32_t rs1;
     uint32_t rs2;
-    char* disassembledInstruction;
+    char disassembledInstruction[MAX_INST_SIZE];
 } Log;
 
 Log* createLog();
