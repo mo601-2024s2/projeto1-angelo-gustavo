@@ -1,0 +1,6 @@
+/.vscode
+# não sei oq eu escrevi aqui embaixo mas tá funcionando pra n pegar os arquivos gerados pelo Makefile
+*
+!*.*
+!*/
+*.o
