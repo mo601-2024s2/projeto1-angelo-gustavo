@@ -3,7 +3,7 @@
 
 
 Mem* createMemory() {
-    Mem* mem = (Mem*) malloc(sizeof(Mem));
+    Mem* mem = malloc(sizeof(Mem));
     
     if (mem == NULL) {
         printf("No memory available for allocating MEM");
