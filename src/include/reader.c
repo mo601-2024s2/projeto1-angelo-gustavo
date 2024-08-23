@@ -46,3 +46,25 @@ void read_elf(char* elf_file) {
         printf("AAAAAAAAAAAAAAAA\n");
     }
 }
+
+
+
+void read_hex(char* hex_file) {
+    FILE* file = fopen(hex_file, "r");
+
+    char **buffer;
+
+    buffer = malloc(100*sizeof(char *));
+    for(int i = 0; i < 100; i++) {
+        buffer[i] = malloc((8+1)*sizeof(char));
+    }
+
+    if(file) {
+        for(int i = 0; i < 100; i++) {
+            fscanf(file, "%s", buffer[i]);
+            printf("%i: %s\n", i, buffer[i]);
+        }
+    }
+
+    fclose(file);
+}
