@@ -66,10 +66,10 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
 
     switch (opcode) {
         case 0x37: // 01101 11 - lui
-            lui(cpu, rd, (instruction >> 12) && 0xFFFFF);
+            lui(cpu, log, rd, (instruction >> 12) && 0xFFFFF);
             break;
         case 0x17: // 00101 11 - auipc
-            auipc(cpu, rd, (instruction >> 12) && 0xFFFFF);
+            auipc(cpu, log, rd, (instruction >> 12) && 0xFFFFF);
             break;
         case 0x13: // 00100 11 - addi, slti, xori, ori, andi, alli, srli, srai
             switch (funct3) {
