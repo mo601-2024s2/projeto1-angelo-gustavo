@@ -10,12 +10,11 @@
 #include <bsd/vis.h>
 #include "reader.h"
 
-void read_elf(char* elf_file) {
+void read_elf(char* elf_file, long int* size, unsigned int* instruction_memory) {
     int i, fd;
     Elf *e;
     GElf_Ehdr ehdr;
-    char *id, bytes[5];
-    // // size_t n;
+    char *id;
     GElf_Shdr shdr;
     Elf_Scn *scn = NULL;
     Elf_Data *data = NULL;
@@ -83,6 +82,10 @@ void read_elf(char* elf_file) {
                 memcpy(&word, ((unsigned char *)data->d_buf) + i, (data->d_size - i) >= 4 ? 4 : (data->d_size - i));
                 printf("%08x ", word);
                 printf("\n");
+
+                instruction_memory[*size] = word;
+
+                *size+=1;
             }
             break;
         }

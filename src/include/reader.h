@@ -7,6 +7,6 @@
 /***
  * Function responsible to read an elf file and return it as a binary vector.
  */
-void read_elf(char* elf_file);
+void read_elf(char* elf_file, long int* size, unsigned int* instruction_memory);
 
 #endif
