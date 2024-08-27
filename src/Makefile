@@ -1,5 +1,5 @@
 CFLAGS = -std=c99 -Wall -Werror -Werror=vla -g
-LDFLAGS = -lm
+LDFLAGS = -lm -lelf
 
 .PHONY: all clean
 
@@ -8,7 +8,7 @@ all: simulator
 objects = main.o include/reader.o
 
 simulator: $(objects)
-	gcc $(CFLAGS) -l elf -o simulator.exe $(objects) $(LDFLAGS)
+	gcc $(CFLAGS) -o simulator.exe $(objects) $(LDFLAGS)
 
 
 main.o: main.c
