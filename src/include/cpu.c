@@ -57,8 +57,8 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
     int rs1 = (instruction >> 15) && 0x1F;
     int rs2 = (instruction >> 19) && 0x1F;
 
-    log->rs1 = getByte(cpu->memory, cpu->regs[rs1]);
-    log->rs2 = getByte(cpu->memory, cpu->regs[rs2]);
+    log->rs1 = getByte(cpu->memory, getReg(cpu, rs1));
+    log->rs2 = getByte(cpu->memory, getReg(cpu, rs2));
 
     int opcode = instruction && 0x7F;
     int funct3 = (instruction >> 12) && 0x7;
@@ -266,7 +266,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             break;
     }
 
-    log->rd = getByte(cpu->memory, cpu->regs[rd]);
+    log->rd = getByte(cpu->memory, getReg(cpu, rd));
 
     printLog(log);
     freeLog(log);
