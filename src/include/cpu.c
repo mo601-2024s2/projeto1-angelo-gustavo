@@ -15,7 +15,19 @@ CPU* createCPU() {
 
     cpu->memory = createMemory();
 
+    cpu->pc = 0;
+    cpu->regs[0] = 0;
+
     return cpu;
+}
+
+void setReg(CPU* cpu, int pos, uint32_t val) {
+    if (pos != 0)
+        cpu->regs[pos] = val;
+}
+
+uint32_t getReg(CPU* cpu, int pos) {
+    return cpu->regs[pos];
 }
 
 void freeCPU(CPU* cpu) {
@@ -25,7 +37,6 @@ void freeCPU(CPU* cpu) {
 
 void runProgram(uint32_t program[], int programSize) {
     CPU* cpu = createCPU();
-    cpu->pc = 0;
 
     while (cpu->pc < programSize) {
         runInstruction(program[cpu->pc], cpu);
