@@ -38,9 +38,9 @@ void freeCPU(CPU* cpu) {
 void runProgram(uint32_t program[], int programSize) {
     CPU* cpu = createCPU();
 
-    while (cpu->pc < programSize) {
-        runInstruction(program[cpu->pc], cpu);
-        cpu->pc++;
+    while (cpu->pc / 4 < programSize) {
+        runInstruction(program[cpu->pc / 4], cpu);
+        cpu->pc += 4;
     }
 
     freeCPU(cpu);
