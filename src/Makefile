@@ -1,5 +1,5 @@
-CFLAGS = -std=c99 -Wall -Werror -Werror=vla -g
-LDFLAGS = -lm -lelf
+CFLAGS = -std=c99 -Wall -g
+LDFLAGS = -lm -lelf -l:libbsd.a
 
 .PHONY: all clean
 
