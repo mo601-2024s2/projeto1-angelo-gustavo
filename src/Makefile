@@ -8,7 +8,7 @@ all: simulator
 objects = main.o include/reader.o
 
 simulator: $(objects)
-	gcc $(CFLAGS) -o simulator.exe $(objects) $(LDFLAGS)
+	gcc $(CFLAGS) -l elf -o simulator.exe $(objects) $(LDFLAGS)
 
 
 main.o: main.c
