@@ -1,70 +1,80 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <elf.h>
+#include <libelf.h>
+#include <fcntl.h>
+#include <gelf.h>
+#include <unistd.h>
+#include <sysexits.h>
+#include <err.h>
+#include <vis.h>
 #include "reader.h"
 
-
-void bin(unsigned n)
-{
-    long long i, j;
-
-    for(i=0;i<sizeof(int);i++) {
-        char byte = ((char*)&n)[i];
-        for (j=8; j>=0; j--) {
-            char bit = (byte >> j) & 1;
-            printf("%hhd", bit);
-        }
-        printf(" ");
-    }
-}
-
-
 void read_elf(char* elf_file) {
-    Elf32_Ehdr header;
+    int i, fd;
+    Elf *e;
+    GElf_Ehdr ehdr;
+    char *id;
+    // // size_t n;
+    // GElf_Shdr shdr;
+    // Elf_Scn *scn = NULL;
+    // Elf_Data *data = NULL;
 
-    FILE* file = fopen(elf_file, "rb");
-
-    unsigned int buffer[100];
-
-
-    if(file) {
-        fread(&header, sizeof(header), 1, file);
-
-        if(memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
-            fread(buffer,sizeof(buffer),1,file);
-            for(int i = 0; i < 100; i++) {
-                bin(buffer[i]);
-                printf("\n");
-            }
-        } else {
-            printf("tristeza\n");
-        }
-
-        fclose(file);
-    } else {
-        printf("AAAAAAAAAAAAAAAA\n");
-    }
-}
-
-
-
-void read_hex(char* hex_file) {
-    FILE* file = fopen(hex_file, "r");
-
-    char **buffer;
-
-    buffer = malloc(100*sizeof(char *));
-    for(int i = 0; i < 100; i++) {
-        buffer[i] = malloc((8+1)*sizeof(char));
+    if (elf_version(EV_CURRENT) == EV_NONE) {
+        fprintf(stderr, "ELF library initialization failed: %s\n", elf_errmsg(-1));
+        exit(EXIT_FAILURE);
     }
 
-    if(file) {
-        for(int i = 0; i < 100; i++) {
-            fscanf(file, "%s", buffer[i]);
-            printf("%i: %s\n", i, buffer[i]);
-        }
+    if ((fd = open(elf_file, O_RDONLY, 0)) < 0) {
+        perror("open");
+        exit(EXIT_FAILURE);
     }
 
-    fclose(file);
+    if ((e = elf_begin(fd, ELF_C_READ, NULL)) == NULL) {
+        fprintf(stderr, "elf_begin() failed: %s.\n", elf_errmsg(-1));
+        exit(EXIT_FAILURE);
+    }
+
+    if (elf_kind(e) != ELF_K_ELF) {
+        fprintf(stderr, "%s is not an ELF object.\n", elf_file);
+        exit(EXIT_FAILURE);
+    }
+
+    if (gelf_getehdr (e, &ehdr ) == NULL ) {
+        errx(EX_SOFTWARE, "getehdr() failed: %s.", elf_errmsg (-1));
+    }
+
+    if ((i = gelf_getclass(e)) == ELFCLASSNONE) {
+        errx(EX_SOFTWARE, "getclass() failed: %s.", elf_errmsg (-1));
+    }
+
+    printf("%s: %d - bit ELF object\n", elf_file, i == ELFCLASS32 ? 32 : 64);
+
+    if ((id = elf_getident(e, NULL)) == NULL) {
+        errx(EX_SOFTWARE , "getident() failed: %s.", elf_errmsg ( -1));
+    }
+
+    printf("%3s e_ident [0..%1d] %7s", " ", EI_ABIVERSION, "\n");
+    // while ((scn = elf_nextscn(e, scn)) != NULL) {
+    //     gelf_getshdr(scn, &shdr);
+    //     char *section_name = elf_strptr(e, elf_ndxscn(scn), shdr.sh_name);
+
+    //     // Look for the .text section where instructions are usually stored
+    //     if (strcmp(section_name, ".text") == 0) {
+    //         data = elf_getdata(scn, data);
+    //         if (data == NULL || data->d_buf == NULL) {
+    //             fprintf(stderr, "Failed to read .text section\n");
+    //             exit(EXIT_FAILURE);
+    //         }
+
+    //         // Print the instructions in hex
+    //         for (size_t i = 0; i < data->d_size; i += 4) {
+    //             uint32_t instruction = *(uint32_t *)((uint8_t *)data->d_buf + i);
+    //             printf("%08x\n", instruction);
+    //         }
+    //     }
+    // }
+
+    // elf_end(e);
+    // close(fd);
 }

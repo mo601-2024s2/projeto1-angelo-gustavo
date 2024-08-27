@@ -9,9 +9,4 @@
  */
 void read_elf(char* elf_file);
 
-/***
- * Function responsible to read a hex file and return it as a hex vector.
- */
-void read_hex(char* hex_file);
-
 #endif
