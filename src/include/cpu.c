@@ -198,12 +198,14 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                                 case 0x2: // 00010 - sret
                                     break;
                                 case 0x5: // 00101 - wfi
+                                    wfi(cpu, log);
                                     break;
                             }
                             break;
                         case 0x18: // 00110 00 - mret
                             break;
                         case 0x9: // 00010 01 - sfence.vma
+                            sfenceVma(cpu, log, rs1, rs2);
                             break;
                     }
                 case 0x1: // 001 - csrrw

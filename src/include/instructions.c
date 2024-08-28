@@ -35,8 +35,14 @@ void ebreak(CPU* cpu, Log* log);
 void uret(CPU* cpu, Log* log);
 void sret(CPU* cpu, Log* log);
 void mret(CPU* cpu, Log* log);
-void wfi(CPU* cpu, Log* log);
-void sfenceVma(CPU* cpu, Log* log, int rs1, int rs2);
+
+void wfi(CPU* cpu, Log* log) {
+    sprintf(log->disassembledInstruction, "wfi");
+}
+void sfenceVma(CPU* cpu, Log* log, int rs1, int rs2) {
+    sprintf(log-disassembledInstruction, "sfence.vma %d %d", rs1, rs2);
+}
+
 void lb(CPU* cpu, Log* log, int rd, int rs1, int offset);
 void lh(CPU* cpu, Log* log, int rd, int rs1, int offset);
 void lw(CPU* cpu, Log* log, int rd, int rs1, int offset);
