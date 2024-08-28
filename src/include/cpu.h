@@ -11,6 +11,8 @@ typedef struct {
 } CPU;
 
 CPU* createCPU();
+void setReg(CPU* cpu, int pos, uint32_t val);
+uint32_t getReg(CPU* cpu, int pos);
 void freeCPU(CPU* cpu);
 void runProgram(uint32_t program[], int programSize);
 void runInstruction(uint32_t instruction, CPU* cpu);

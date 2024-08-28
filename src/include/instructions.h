@@ -2,10 +2,12 @@
     Implementations of specific instructions
 */
 
+#ifndef INSTRUCTIONS_H
+#define INSTRUCTIONS_H
+
 #include <stdint.h>
 #include "log.h"
-
-typedef struct CPU;
+#include "cpu.h"
 
 // RV32I
 
@@ -72,3 +74,5 @@ void opDiv(CPU* cpu, Log* log, int rd, int rs1, int rs2);
 void divu(CPU* cpu, Log* log, int rd, int rs1, int rs2);
 void rem(CPU* cpu, Log* log, int rd, int rs1, int rs2);
 void remu(CPU* cpu, Log* log, int rd, int rs1, int rs2);
+
+#endif
