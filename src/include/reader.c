@@ -1,70 +1,95 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <elf.h>
+#include <libelf.h>
+#include <fcntl.h>
+#include <gelf.h>
+#include <unistd.h>
+#include <sysexits.h>
+#include <err.h>
+#include <bsd/vis.h>
 #include "reader.h"
 
+void read_elf(char* elf_file, long int* size, unsigned int* instruction_memory) {
+    int i, fd;
+    Elf *e;
+    GElf_Ehdr ehdr;
+    char *id;
+    GElf_Shdr shdr;
+    Elf_Scn *scn = NULL;
+    Elf_Data *data = NULL;
+    size_t shstrndx;
 
-void bin(unsigned n)
-{
-    long long i, j;
-
-    for(i=0;i<sizeof(int);i++) {
-        char byte = ((char*)&n)[i];
-        for (j=8; j>=0; j--) {
-            char bit = (byte >> j) & 1;
-            printf("%hhd", bit);
-        }
-        printf(" ");
+    if (elf_version(EV_CURRENT) == EV_NONE) {
+        fprintf(stderr, "ELF library initialization failed: %s\n", elf_errmsg(-1));
+        exit(EXIT_FAILURE);
     }
-}
 
+    if ((fd = open(elf_file, O_RDONLY, 0)) < 0) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
 
-void read_elf(char* elf_file) {
-    Elf32_Ehdr header;
+    if ((e = elf_begin(fd, ELF_C_READ, NULL)) == NULL) {
+        fprintf(stderr, "elf_begin() failed: %s.\n", elf_errmsg(-1));
+        exit(EXIT_FAILURE);
+    }
 
-    FILE* file = fopen(elf_file, "rb");
+    if (elf_kind(e) != ELF_K_ELF) {
+        fprintf(stderr, "%s is not an ELF object.\n", elf_file);
+        exit(EXIT_FAILURE);
+    }
 
-    unsigned int buffer[100];
+    if (gelf_getehdr (e, &ehdr) == NULL) {
+        errx(EX_SOFTWARE, "getehdr() failed: %s.", elf_errmsg (-1));
+    }
 
+    if (elf_getshdrstrndx(e, &shstrndx) != 0) {
+        fprintf(stderr, "elf_getshdrstrndx failed: %s\n", elf_errmsg(-1));
+    }
 
-    if(file) {
-        fread(&header, sizeof(header), 1, file);
+    if ((i = gelf_getclass(e)) == ELFCLASSNONE) {
+        errx(EX_SOFTWARE, "getclass() failed: %s.", elf_errmsg (-1));
+    }
 
-        if(memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
-            fread(buffer,sizeof(buffer),1,file);
-            for(int i = 0; i < 100; i++) {
-                bin(buffer[i]);
-                printf("\n");
+    if ((id = elf_getident(e, NULL)) == NULL) {
+        errx(EX_SOFTWARE , "getident() failed: %s.", elf_errmsg ( -1));
+    }
+
+    while ((scn = elf_nextscn(e, scn)) != NULL) {
+        if(!gelf_getshdr(scn, &shdr)) {
+            fprintf(stderr, "gelf_getshdr failed: %s\n", elf_errmsg(-1));
+            elf_end(e);
+            close(fd);
+        }
+        char *section_name = elf_strptr(e, shstrndx, shdr.sh_name);
+
+        // Look for the .text section where instructions are usually stored
+        if (strcmp(section_name, ".text") == 0) {
+            printf("Found .text section at offset 0x%jx with size 0x%jx\n", (uintmax_t)shdr.sh_offset, (uintmax_t)shdr.sh_size);
+
+            // Get the data from .text section
+            data = elf_getdata(scn, NULL);
+            if (data == NULL || data->d_buf == NULL) {
+                fprintf(stderr, "Failed to read .text section\n");
+                exit(EXIT_FAILURE);
             }
-        } else {
-            printf("tristeza\n");
-        }
+            printf("Data in .text section (grouped 4 bytes at a time):\n");
+            // Each "word" is an instruction
+            for (size_t i = 0; i < data->d_size; i += 4) {
+                // Handle cases where the remaining data is less than 4 bytes
+                unsigned int word = 0;
+                memcpy(&word, ((unsigned char *)data->d_buf) + i, (data->d_size - i) >= 4 ? 4 : (data->d_size - i));
+                printf("%08x ", word);
+                printf("\n");
 
-        fclose(file);
-    } else {
-        printf("AAAAAAAAAAAAAAAA\n");
-    }
-}
+                instruction_memory[*size] = word;
 
-
-
-void read_hex(char* hex_file) {
-    FILE* file = fopen(hex_file, "r");
-
-    char **buffer;
-
-    buffer = malloc(100*sizeof(char *));
-    for(int i = 0; i < 100; i++) {
-        buffer[i] = malloc((8+1)*sizeof(char));
-    }
-
-    if(file) {
-        for(int i = 0; i < 100; i++) {
-            fscanf(file, "%s", buffer[i]);
-            printf("%i: %s\n", i, buffer[i]);
+                *size+=1;
+            }
+            break;
         }
     }
-
-    fclose(file);
+    elf_end(e);
+    close(fd);
 }
