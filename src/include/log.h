@@ -8,6 +8,8 @@
     - rs2 value before instruction (hex)
     - Disassembled instruction
 */
+#ifndef LOG_H
+#define LOG_H
 
 #include <stdint.h>
 #define MAX_INST_SIZE 64
@@ -24,3 +26,5 @@ typedef struct {
 Log* createLog();
 void printLog(Log* log);
 void freeLog(Log* log);
+
+#endif

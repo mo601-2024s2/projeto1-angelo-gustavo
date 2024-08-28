@@ -1,6 +1,9 @@
 /*
     Responsible for reading, interpreting and executing instructions
 */
+#ifndef CPU_H
+#define CPU_H
+
 #include <stdint.h>
 #include "memory.h"
 
@@ -16,3 +19,5 @@ uint32_t getReg(CPU* cpu, int pos);
 void freeCPU(CPU* cpu);
 void runProgram(uint32_t program[], int programSize);
 void runInstruction(uint32_t instruction, CPU* cpu);
+
+#endif
