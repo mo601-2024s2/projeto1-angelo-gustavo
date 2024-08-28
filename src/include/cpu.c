@@ -223,16 +223,22 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             }
             break;
         case 0x3: // 00000 11 - lb, lh, lw, lbu, lhu
+            int offset = (instruction >> 20) && 0b111111111111;
             switch (funct3) {
                 case 0x0: // 000 - lb
+                    lb(cpu, log, rd, rs1, offset);
                     break;
                 case 0x1: // 001 - lh
+                    lh(cpu, log, rd, rs1, offset);
                     break;
                 case 0x2: // 010 - lw
+                    lw(cpu, log, rd, rs1, offset);
                     break;
                 case 0x4: // 100 - lbu
+                    lbu(cpu, log, rd, rs1, offset);
                     break;
                 case 0x5: // 101 - lhu
+                    lhu(cpu, log, rd, rs1, offset);
                     break;
             }
             break;
@@ -251,11 +257,10 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
         case 0x67: // 11001 11 - jalr
             break;
         case 0x63: // 11000 11 - beq, bne, blt, bge, bltu, bgeu
-            uint32_t offset = 0;
-            offset = (offset << 4) + ((instruction >> 8) && 0b1111);    // 4:1
+            int offset = ((instruction >> 8) && 0b1111);    // 4:1
             offset = (offset << 6) + ((instruction >> 25) && 0b111111); // 5:10
-            offset = (offset << 1) + ((instruction >> 31) && 0b1);      // 11
-            offset = (offset << 1) + ((instruction >> 11) && 0b1);      // 12
+            offset = (offset << 1) + ((instruction >> 7) && 0b1);       // 11
+            offset = (offset << 1) + ((instruction >> 31) && 0b1);      // 12
             switch (funct3) {
                 case 0x0: // 000 - beq
                     beq(cpu, log, rs1, rs2, offset);
