@@ -94,9 +94,42 @@ void lhu(CPU* cpu, Log* log, int rd, int rs1, int offset) {
 
     setReg(cpu, rd, val);
 }
-void sb(CPU* cpu, Log* log, int rs1, int rs2, int offset);
-void sh(CPU* cpu, Log* log, int rs1, int rs2, int offset);
-void sw(CPU* cpu, Log* log, int rs1, int rs2, int offset);
+
+void sb(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
+    sprintf(log->disassembledInstruction, "sb %d,%d(%d)", rs2, offset, rs1);
+
+    int address = (int) getReg(cpu, rs1) + offset;
+    uint8_t val = (uint8_t) getReg(cpu, rs2) && 0b11111111;
+    
+    insertByte(cpu->memory, address, val);
+}
+void sh(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
+    sprintf(log->disassembledInstruction, "sh %d,%d(%d)", rs2, offset, rs1);
+
+    int address = (int) getReg(cpu, rs1) + offset;
+    uint32_t reg = getReg(cpu, rs2);
+    uint8_t valL = (uint8_t) reg && 0b11111111;
+    uint8_t valH = (uint8_t) (reg >> 8) && 0b11111111;
+    
+    insertByte(cpu->memory, address, valH);
+    insertByte(cpu->memory, address + 1, valL);
+}
+void sw(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
+    sprintf(log->disassembledInstruction, "sw %d,%d(%d)", rs2, offset, rs1);
+
+    int address = (int) getReg(cpu, rs1) + offset;
+    uint32_t reg = getReg(cpu, rs2);
+    uint8_t valL = (uint8_t) reg && 0b11111111;
+    uint8_t valLH = (uint8_t) (reg >> 8) && 0b11111111;
+    uint8_t valHL = (uint8_t) (reg >> 16) && 0b11111111;
+    uint8_t valH = (uint8_t) (reg >> 24) && 0b11111111;
+    
+    insertByte(cpu->memory, address, valH);
+    insertByte(cpu->memory, address + 1, valHL);
+    insertByte(cpu->memory, address + 2, valLH);
+    insertByte(cpu->memory, address + 3, valL);
+}
+
 void jal(CPU* cpu, Log* log, int rd, int offset);
 void jalr(CPU* cpu, Log* log, int rd, int rs1, int offset);
 
