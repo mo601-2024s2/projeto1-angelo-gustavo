@@ -1,15 +1,5 @@
-/*
-    Implementations of specific instructions
-*/
-
-#ifndef INSTRUCTIONS_H
-#define INSTRUCTIONS_H
-
-#include <stdint.h>
-#include "log.h"
-#include "cpu.h"
-
-// RV32I
+#include <stdio.h>
+#include "instructions.h"
 
 void lui(CPU* cpu, Log* log, int rd, int imm);
 void auipc(CPU* cpu, Log* log, int rd, int imm);
@@ -57,12 +47,40 @@ void sh(CPU* cpu, Log* log, int rs1, int rs2, int offset);
 void sw(CPU* cpu, Log* log, int rs1, int rs2, int offset);
 void jal(CPU* cpu, Log* log, int rd, int offset);
 void jalr(CPU* cpu, Log* log, int rd, int rs1, int offset);
-void beq(CPU* cpu, Log* log, int rs1, int rs2, int offset);
-void bne(CPU* cpu, Log* log, int rs1, int rs2, int offset);
-void blt(CPU* cpu, Log* log, int rs1, int rs2, int offset);
-void bge(CPU* cpu, Log* log, int rs1, int rs2, int offset);
-void bltu(CPU* cpu, Log* log, int rs1, int rs2, int offset);
-void bgeu(CPU* cpu, Log* log, int rs1, int rs2, int offset);
+
+void setBranchLog(Log* log, char instName[], int rs1, int rs2, int offset) {
+    sprintf(log->disassembledInstruction, "%s x%d x%d %d", instName, rs1, rs2, offset);
+}
+void beq(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
+    setBranchLog(log, "beq", rs1, rs2, offset);
+    if ((int) getReg(cpu, rs1) == (int) getReg(cpu, rs2))
+        cpu->pc += offset - 4;
+}
+void bne(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
+    setBranchLog(log, "bne", rs1, rs2, offset);
+    if ((int) getReg(cpu, rs1) != (int) getReg(cpu, rs2))
+        cpu->pc += offset - 4;
+}
+void blt(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
+    setBranchLog(log, "blt", rs1, rs2, offset);
+    if ((int) getReg(cpu, rs1) < (int) getReg(cpu, rs2))
+        cpu->pc += offset - 4;
+}
+void bge(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
+    setBranchLog(log, "bge", rs1, rs2, offset);
+    if ((int) getReg(cpu, rs1) >= (int) getReg(cpu, rs2))
+        cpu->pc += offset - 4;
+}
+void bltu(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
+    setBranchLog(log, "bltu", rs1, rs2, offset);
+    if (getReg(cpu, rs1) < getReg(cpu, rs2))
+        cpu->pc += offset - 4;
+}
+void bgeu(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
+    setBranchLog(log, "bgeu", rs1, rs2, offset);
+    if (getReg(cpu, rs1) >= getReg(cpu, rs2))
+        cpu->pc += offset - 4;
+}
 
 // RV32M
 
@@ -74,5 +92,3 @@ void opDiv(CPU* cpu, Log* log, int rd, int rs1, int rs2);
 void divu(CPU* cpu, Log* log, int rd, int rs1, int rs2);
 void rem(CPU* cpu, Log* log, int rd, int rs1, int rs2);
 void remu(CPU* cpu, Log* log, int rd, int rs1, int rs2);
-
-#endif

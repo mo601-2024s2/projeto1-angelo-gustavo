@@ -53,9 +53,9 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
     log->instruction = instruction;
     log->pc = cpu->pc;
     
-    int rd = (instruction >> 11) && 0x1F;
-    int rs1 = (instruction >> 15) && 0x1F;
-    int rs2 = (instruction >> 19) && 0x1F;
+    int rd = (instruction >> 7) && 0b11111;
+    int rs1 = (instruction >> 15) && 0b11111;
+    int rs2 = (instruction >> 19) && 0b11111;
 
     log->rs1 = getByte(cpu->memory, getReg(cpu, rs1));
     log->rs2 = getByte(cpu->memory, getReg(cpu, rs2));
@@ -249,18 +249,29 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
         case 0x67: // 11001 11 - jalr
             break;
         case 0x63: // 11000 11 - beq, bne, blt, bge, bltu, bgeu
+            uint32_t offset = 0;
+            offset = (offset << 4) + ((instruction >> 8) && 0b1111);    // 4:1
+            offset = (offset << 6) + ((instruction >> 25) && 0b111111); // 5:10
+            offset = (offset << 1) + ((instruction >> 31) && 0b1);      // 11
+            offset = (offset << 1) + ((instruction >> 11) && 0b1);      // 12
             switch (funct3) {
                 case 0x0: // 000 - beq
+                    beq(cpu, log, rs1, rs2, offset);
                     break;
                 case 0x1: // 001 - bne
+                    bne(cpu, log, rs1, rs2, offset);
                     break;
                 case 0x4: // 100 - blt
+                    blt(cpu, log, rs1, rs2, offset);
                     break;
                 case 0x5: // 101 - bge
+                    bge(cpu, log, rs1, rs2, offset);
                     break;
                 case 0x6: // 110 - bltu
+                    bltu(cpu, log, rs1, rs2, offset);
                     break;
                 case 0x7: // 111 - bgeu
+                    bgeu(cpu, log, rs1, rs2, offset);
                     break;
             }
             break;
