@@ -17,6 +17,7 @@ CPU* createCPU() {
 
     cpu->pc = 0;
     cpu->regs[0] = 0;
+    cpu->csr = 0;
 
     return cpu;
 }
@@ -53,46 +54,57 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
     log->instruction = instruction;
     log->pc = cpu->pc;
     
-    int rd = (instruction >> 7) && 0b11111;
-    int rs1 = (instruction >> 15) && 0b11111;
-    int rs2 = (instruction >> 19) && 0b11111;
+    int rd = (instruction >> 7) & 0b11111;
+    int rs1 = (instruction >> 15) & 0b11111;
+    int rs2 = (instruction >> 19) & 0b11111;
 
     log->rs1 = getByte(cpu->memory, getReg(cpu, rs1));
     log->rs2 = getByte(cpu->memory, getReg(cpu, rs2));
 
-    int opcode = instruction && 0x7F;
-    int funct3 = (instruction >> 12) && 0x7;
-    int funct7 = (instruction >> 25) && 0x7F;
+    int opcode = instruction & 0x7F;
+    int funct3 = (instruction >> 12) & 0x7;
+    int funct7 = (instruction >> 25) & 0x7F;
+
+    int offset;
 
     switch (opcode) {
         case 0x37: // 01101 11 - lui
-            lui(cpu, log, rd, (instruction >> 12) && 0xFFFFF);
+            lui(cpu, log, rd, (instruction >> 12) & 0xFFFFF);
             break;
         case 0x17: // 00101 11 - auipc
-            auipc(cpu, log, rd, (instruction >> 12) && 0xFFFFF);
+            auipc(cpu, log, rd, (instruction >> 12) & 0xFFFFF);
             break;
         case 0x13: // 00100 11 - addi, slti, xori, ori, andi, alli, srli, srai
             switch (funct3) {
                 case 0X0: // 000 - addi
+                    addi(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
                     break;
                 case 0X2: // 010 - slti
+                    slti(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
                     break;
                 case 0X3: // 011 - sltiu
+                    sltiu(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
                     break;
                 case 0X4: // 100 - xori
+                    xori(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
                     break;
                 case 0X6: // 110 - ori
+                    ori(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
                     break;
                 case 0X7: // 111 - andi
+                    andi(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
                     break;
                 case 0X1: // 001 - slli
+                    slli(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
                     break;
                 case 0X5: // 101 - srli, srai
                     int effectiveFunct7 = (instruction >> 27) && 0x1F;
                     switch (effectiveFunct7) {
                         case 0x0: // 00000 - srli
+                            srli(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
                             break;
                         case 0x8: // 01000 - srai
+                            srai(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
                             break;
                     }
                     break;
@@ -103,16 +115,19 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                 case 0X0: // 000 - add, sub, mul
                     switch (funct7) {
                         case 0x0: // 00000 00 - add
+                            add(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mul
                             break;
                         case 0x20: // 01000 00 - sub
+                            sub(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
                 case 0X1: // 001 - sll, mulh
                     switch (funct7) {
                         case 0x0: // 00000 00 - sll
+                            sll(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mulh
                             break;
@@ -121,14 +136,16 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                 case 0X2: // 010 - slt, mulhsu
                     switch (funct7) {
                         case 0x0: // 00000 00 - slt
+                            slt(cpu, log, rd, rs1, rs2);
                             break;
-                        case 0x1: // 00000 01 - mul
+                        case 0x1: // 00000 01 - mulhsu
                             break;
                     }
                     break;
                 case 0X3: // 011 - sltu, mulhu
                     switch (funct7) {
                         case 0x0: // 00000 00 - sltu
+                            sltu(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mulhu
                             break;
@@ -137,6 +154,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                 case 0X4: // 100 - xor, div
                     switch (funct7) {
                         case 0x0: // 00000 00 - xor
+                            xorOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - div
                             break;
@@ -145,16 +163,19 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                 case 0X5: // 101 - srl, sra, divu
                     switch (funct7) {
                         case 0x0: // 00000 00 - srl
+                            srl(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - divu
                             break;
                         case 0x20: // 01000 00 - sra
+                            sra(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
                 case 0x6: // 110 - or, rem
                     switch (funct7) {
                         case 0x0: // 00000 00 - or
+                            orOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - rem
                             break;
@@ -163,6 +184,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                 case 0X7: // 111 - and, remu
                     switch (funct7) {
                         case 0x0: // 00000 00 - and
+                            andOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - remu
                             break;
@@ -173,8 +195,10 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
         case 0xF: // 00011 11 - fence, fence.i
             switch (funct3) {
                 case 0x0: // 000 - fence
+                    // acho q dá pra deixar só assim mesmo pq a instrução é inútil
                     break;
                 case 0x1: // 001 - fence.i
+                    // read comment above
                     break;
             }
             break;
@@ -186,8 +210,10 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                         case 0x0: // 00000 00 - ecall, ebreak, uret
                             switch (f) {
                                 case 0x0: // 00000 - ecall
+                                    ecall(cpu, log);
                                     break;
                                 case 0x1: // 00001 - ebreak
+                                    ebreak(cpu, log);
                                     break;
                                 case 0x2: // 00010 - uret
                                     break;
@@ -209,21 +235,27 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             break;
                     }
                 case 0x1: // 001 - csrrw
+                    csrrw(cpu, log, rd, rs1, cpu->csr);
                     break;
                 case 0x2: // 010 - csrrs
+                    csrrs(cpu, log, rd, rs1, cpu->csr);
                     break;
                 case 0x3: // 011 - csrrc
+                    csrrc(cpu, log, rd, rs1, cpu->csr);
                     break;
                 case 0x5: // 101 - csrrwi
+                    csrrwi(cpu, log, rd, rs1, cpu->csr);
                     break;
                 case 0x6: // 110 - csrrsi
+                    csrrsi(cpu, log, rd, rs1, cpu->csr);
                     break;
                 case 0x7: // 111 - csrrci
+                    csrrci(cpu, log, rd, rs1, cpu->csr);
                     break;
             }
             break;
         case 0x3: // 00000 11 - lb, lh, lw, lbu, lhu
-            int offset = (instruction >> 20) && 0b111111111111;
+            offset = (instruction >> 20) && 0b111111111111;
             switch (funct3) {
                 case 0x0: // 000 - lb
                     lb(cpu, log, rd, rs1, offset);
@@ -243,7 +275,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             }
             break;
         case 0x23: // 01000 11 - sb, sh, sw
-            int offset = (instruction >> 25);                           // 11:5
+            offset = (instruction >> 25);                           // 11:5
             offset = (offset << 7) + (instruction >> 7) && 0b11111;     // 4:0
             switch (funct3) {
                 case 0x0: // 000 - sb
@@ -262,10 +294,10 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
         case 0x67: // 11001 11 - jalr
             break;
         case 0x63: // 11000 11 - beq, bne, blt, bge, bltu, bgeu
-            int offset = (instruction >> 31);                           // 12
-            offset = (offset << 1) + (instruction >> 7) && 0b1;         // 11
-            offset = (offset << 1) + (instruction >> 25) && 0b111111;   // 5:10
-            offset = (offset << 6) + (instruction >> 8) && 0b1111;      // 1:4
+            offset = (instruction >> 31);                           // 12
+            offset = ((offset << 1) + (instruction >> 7)) & 0b1;         // 11
+            offset = ((offset << 1) + (instruction >> 25)) & 0b111111;   // 5:10
+            offset = ((offset << 6) + (instruction >> 8)) & 0b1111;      // 1:4
             offset = offset << 1;                                       // 0
             switch (funct3) {
                 case 0x0: // 000 - beq

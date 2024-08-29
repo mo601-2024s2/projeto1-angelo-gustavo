@@ -5,7 +5,7 @@ LDFLAGS = -lm -lelf -l:libbsd.a
 
 all: simulator
 
-objects = main.o include/cpu.o include/instructions.o include/memory.o include/reader.o
+objects = main.o include/cpu.o include/instructions.o include/memory.o include/reader.o include/log.o
 
 simulator: $(objects)
 	gcc $(CFLAGS) -o simulator.exe $(objects) $(LDFLAGS)
@@ -25,6 +25,9 @@ memory.o: include/memory.c
 
 reader.o: include/reader.c
 	gcc $(CFLAGS) -c include/reader.c $(LDFLAGS)
+
+log.o: include/log.c
+	gcc $(CFLAGS) -c include/log.c $(LDFLAGS)
 
 clean:
 	rm -f simulator.exe
