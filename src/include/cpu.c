@@ -118,6 +118,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             add(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mul
+                            mul(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x20: // 01000 00 - sub
                             sub(cpu, log, rd, rs1, rs2);
@@ -130,6 +131,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             sll(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mulh
+                            mulh(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -139,6 +141,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             slt(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mulhsu
+                            mulhsu(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -148,6 +151,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             sltu(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mulhu
+                            mulhu(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -157,6 +161,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             xorOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - div
+                            divOp(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -166,6 +171,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             srl(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - divu
+                            divu(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x20: // 01000 00 - sra
                             sra(cpu, log, rd, rs1, rs2);
@@ -178,6 +184,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             orOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - rem
+                            rem(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -187,6 +194,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             andOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - remu
+                            remu(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
