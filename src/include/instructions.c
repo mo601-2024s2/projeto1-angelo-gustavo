@@ -185,7 +185,7 @@ void fenceI(CPU* cpu, Log* log) {
 void csrrw(CPU* cpu, Log* log, int rd, int rs1, int csr) {
     sprintf(log->disassembledInstruction, "csrrw %d,%d,%d", rd, rs1, csr);
 
-    uint32_t val = (int) cpu->csr;
+    uint32_t val = (int) csr;
 
     setReg(cpu, rd, val);
     cpu->csr = rs1;
@@ -194,7 +194,7 @@ void csrrw(CPU* cpu, Log* log, int rd, int rs1, int csr) {
 void csrrs(CPU* cpu, Log* log, int rd, int rs1, int csr) {
     sprintf(log->disassembledInstruction, "csrrs %d,%d,%d", rd, rs1, csr);
 
-    uint32_t val = (int) cpu->csr;
+    uint32_t val = (int) csr;
     setReg(cpu, rd, val);
 
     val = val | (int) getReg(cpu, rs1);
@@ -205,7 +205,7 @@ void csrrs(CPU* cpu, Log* log, int rd, int rs1, int csr) {
 void csrrc(CPU* cpu, Log* log, int rd, int rs1, int csr) {
     sprintf(log->disassembledInstruction, "csrrc %d,%d,%d", rd, rs1, csr);
 
-    uint32_t val = (int) cpu->csr;
+    uint32_t val = (int) csr;
     setReg(cpu, rd, val);
 
     val = val | ~(int) getReg(cpu, rs1);
@@ -216,7 +216,7 @@ void csrrc(CPU* cpu, Log* log, int rd, int rs1, int csr) {
 void csrrwi(CPU* cpu, Log* log, int rd, int uimm, int csr) {
     sprintf(log->disassembledInstruction, "csrrwi %d,%d,%d", rd, uimm, csr);
 
-    uint32_t val = (int) cpu->csr;
+    uint32_t val = (int) csr;
     setReg(cpu, rd, val);
 
     val = (uint32_t) uimm;
@@ -227,7 +227,7 @@ void csrrwi(CPU* cpu, Log* log, int rd, int uimm, int csr) {
 void csrrsi(CPU* cpu, Log* log, int rd, int uimm, int csr) {
     sprintf(log->disassembledInstruction, "csrrsi %d,%d,%d", rd, uimm, csr);
 
-    uint32_t val = (int) cpu->csr;
+    uint32_t val = (int) csr;
     setReg(cpu, rd, val);
 
     val = val | (uint32_t) uimm;
@@ -237,7 +237,7 @@ void csrrsi(CPU* cpu, Log* log, int rd, int uimm, int csr) {
 void csrrci(CPU* cpu, Log* log, int rd, int uimm, int csr) {
     sprintf(log->disassembledInstruction, "csrrci %d,%d,%d", rd, uimm, csr);
 
-    uint32_t val = (int) cpu->csr;
+    uint32_t val = (int) csr;
     setReg(cpu, rd, val);
 
     val = val | (uint32_t) uimm;
