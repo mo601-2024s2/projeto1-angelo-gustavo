@@ -368,13 +368,13 @@ void sw(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
 }
 
 void jal(CPU* cpu, Log* log, int rd, int offset) {
-    sprintf(log, "jal %d,%d", rd, offset);
+    sprintf(log, "jal x%d,%d", rd, offset);
 
     setReg(cpu, rd, cpu->pc + 4);
     cpu->pc += offset - 4;
 }
 void jalr(CPU* cpu, Log* log, int rd, int rs1, int offset) {
-    sprintf(log, "jalr %d,%d,%d", rd, rs1, offset);
+    sprintf(log, "jalr x%d,x%d,%d", rd, rs1, offset);
 
     int t = cpu->pc + 4;
     cpu->pc = (getReg(cpu, rs1) + offset) & ~1;
@@ -417,11 +417,46 @@ void bgeu(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
 
 // RV32M
 
-void mul(CPU* cpu, Log* log, int rd, int rs1, int rs2);
-void mulh(CPU* cpu, Log* log, int rd, int rs1, int rs2);
-void mulhsu(CPU* cpu, Log* log, int rd, int rs1, int rs2);
-void mulhu(CPU* cpu, Log* log, int rd, int rs1, int rs2);
-void opDiv(CPU* cpu, Log* log, int rd, int rs1, int rs2);
-void divu(CPU* cpu, Log* log, int rd, int rs1, int rs2);
-void rem(CPU* cpu, Log* log, int rd, int rs1, int rs2);
-void remu(CPU* cpu, Log* log, int rd, int rs1, int rs2);
+void set3RLog(Log* log, char instName[], int rd, int rs1, int rs2) {
+    sprintf(log->disassembledInstruction, "%s x%d,x%d,x%d", instName, rd, rs1, rs2);
+}
+void mul(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
+    set3RLog(log, "mul", rd, rs1, rs2);
+
+    setReg(cpu, rd, (int) getReg(cpu, rs1) * (int) getReg(cpu, rs2));
+}
+void mulh(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
+    set3RLog(log, "mulh", rd, rs1, rs2);
+
+    setReg(cpu, rd, ((int) getReg(cpu, rs1) * (int) getReg(cpu, rs2)) >> 32);
+}
+void mulhsu(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
+    set3RLog(log, "mulhsu", rd, rs1, rs2);
+
+    setReg(cpu, rd, ((int) getReg(cpu, rs1) * getReg(cpu, rs2)) >> 32);
+}
+void mulhu(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
+    set3RLog(log, "mulhu", rd, rs1, rs2);
+
+    setReg(cpu, rd, (getReg(cpu, rs1) * getReg(cpu, rs2)) >> 32);
+}
+void opDiv(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
+    set3RLog(log, "div", rd, rs1, rs2);
+
+    setReg(cpu, rd, (int) getReg(cpu, rs1) / (int) getReg(cpu, rs2));
+}
+void divu(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
+    set3RLog(log, "divu", rd, rs1, rs2);
+
+    setReg(cpu, rd, getReg(cpu, rs1) / getReg(cpu, rs2));
+}
+void rem(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
+    set3RLog(log, "rem", rd, rs1, rs2);
+
+    setReg(cpu, rd, (int) getReg(cpu, rs1) % (int) getReg(cpu, rs2));
+}
+void remu(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
+    set3RLog(log, "remu", rd, rs1, rs2);
+
+    setReg(cpu, rd, getReg(cpu, rs1) % getReg(cpu, rs2));
+}
