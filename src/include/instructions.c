@@ -367,8 +367,19 @@ void sw(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
     insertByte(cpu->memory, address + 3, valL);
 }
 
-void jal(CPU* cpu, Log* log, int rd, int offset);
-void jalr(CPU* cpu, Log* log, int rd, int rs1, int offset);
+void jal(CPU* cpu, Log* log, int rd, int offset) {
+    sprintf(log, "jal %d,%d", rd, offset);
+
+    setReg(cpu, rd, cpu->pc + 4);
+    cpu->pc += offset - 4;
+}
+void jalr(CPU* cpu, Log* log, int rd, int rs1, int offset) {
+    sprintf(log, "jalr %d,%d,%d", rd, rs1, offset);
+
+    int t = cpu->pc + 4;
+    cpu->pc = (getReg(cpu, rs1) + offset) & ~1;
+    setReg(cpu, rd, t);
+}
 
 void setBranchLog(Log* log, char instName[], int rs1, int rs2, int offset) {
     sprintf(log->disassembledInstruction, "%s x%d x%d %d", instName, rs1, rs2, offset);
