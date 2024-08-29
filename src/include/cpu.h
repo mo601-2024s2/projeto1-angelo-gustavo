@@ -10,6 +10,7 @@
 typedef struct {
     uint32_t regs[32];
     uint32_t pc;
+    uint32_t csr;
     Mem* memory;
 } CPU;
 

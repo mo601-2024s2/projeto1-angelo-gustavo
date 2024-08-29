@@ -17,6 +17,7 @@ CPU* createCPU() {
 
     cpu->pc = 0;
     cpu->regs[0] = 0;
+    cpu->csr = 0;
 
     return cpu;
 }
@@ -68,8 +69,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
 
     switch (opcode) {
         case 0x37: // 01101 11 - lui
-            // lui(cpu, log, rd, (instruction >> 12) && 0xFFFFF);
-            printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+            lui(cpu, log, rd, (instruction >> 12) & 0xFFFFF);
             break;
         case 0x17: // 00101 11 - auipc
             // auipc(cpu, log, rd, (instruction >> 12) && 0xFFFFF);
