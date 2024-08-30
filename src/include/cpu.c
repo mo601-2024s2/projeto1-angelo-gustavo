@@ -118,6 +118,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             add(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mul
+                            mul(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x20: // 01000 00 - sub
                             sub(cpu, log, rd, rs1, rs2);
@@ -130,6 +131,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             sll(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mulh
+                            mulh(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -139,6 +141,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             slt(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mulhsu
+                            mulhsu(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -148,6 +151,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             sltu(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - mulhu
+                            mulhu(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -157,6 +161,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             xorOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - div
+                            divOp(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -166,6 +171,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             srl(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - divu
+                            divu(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x20: // 01000 00 - sra
                             sra(cpu, log, rd, rs1, rs2);
@@ -178,6 +184,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             orOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - rem
+                            rem(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -187,6 +194,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             andOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - remu
+                            remu(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -275,8 +283,8 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             }
             break;
         case 0x23: // 01000 11 - sb, sh, sw
-            offset = (instruction >> 25);                           // 11:5
-            offset = (offset << 7) + (instruction >> 7) && 0b11111;     // 4:0
+            offset = (instruction >> 25);                                   // 11:5
+            offset = (offset << 7) + (instruction >> 7) && 0b11111;         // 4:0
             switch (funct3) {
                 case 0x0: // 000 - sb
                     sb(cpu, log, rs1, rs2, offset);
@@ -290,15 +298,23 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             }
             break;
         case 0x6F: // 11011 11 - jal
+            offset = instruction >> 31;                                     // 20
+            offset = (offset << 1) + ((instruction >> 15) & 0b11111);       // 12:19
+            offset = (offset << 5) + ((instruction >> 20) & 0b1);           // 11
+            offset = (offset << 1) + ((instruction >> 21) & 0b1111111111);  // 1:10
+            offset = offset << 1;                                           // 0
+            jal(cpu, log, rd, offset);
             break;
         case 0x67: // 11001 11 - jalr
+            offset = instruction >> 20;                                     // 0:11
+            jalr(cpu, log, rd, rs1, offset);
             break;
         case 0x63: // 11000 11 - beq, bne, blt, bge, bltu, bgeu
-            offset = (instruction >> 31);                           // 12
-            offset = ((offset << 1) + (instruction >> 7)) & 0b1;         // 11
-            offset = ((offset << 1) + (instruction >> 25)) & 0b111111;   // 5:10
-            offset = ((offset << 6) + (instruction >> 8)) & 0b1111;      // 1:4
-            offset = offset << 1;                                       // 0
+            offset = (instruction >> 31);                                   // 12
+            offset = (offset << 1) + ((instruction >> 7) & 0b1);            // 11
+            offset = (offset << 1) + ((instruction >> 25) & 0b111111);      // 5:10
+            offset = (offset << 6) + ((instruction >> 8) & 0b1111);         // 1:4
+            offset = offset << 1;                                           // 0
             switch (funct3) {
                 case 0x0: // 000 - beq
                     beq(cpu, log, rs1, rs2, offset);
