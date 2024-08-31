@@ -281,7 +281,7 @@ void sfenceVma(CPU* cpu, Log* log, int rs1, int rs2) {
 }
 
 void lb(CPU* cpu, Log* log, int rd, int rs1, int offset) {
-    sprintf(log->disassembledInstruction, "lb %d,%d(%d)", rd, offset, rs1);
+    sprintf(log->disassembledInstruction, "lb x%d,%d(x%d)", rd, offset, rs1);
 
     int address = (int) getReg(cpu, rs1) + offset;
     uint32_t val = (uint32_t) getByte(cpu->memory, address);
@@ -292,7 +292,7 @@ void lb(CPU* cpu, Log* log, int rd, int rs1, int offset) {
     setReg(cpu, rd, val);
 }
 void lh(CPU* cpu, Log* log, int rd, int rs1, int offset) {
-    sprintf(log->disassembledInstruction, "lh %d,%d(%d)", rd, offset, rs1);
+    sprintf(log->disassembledInstruction, "lh x%d,%d(x%d)", rd, offset, rs1);
     
     int address = (int) getReg(cpu, rs1) + offset;
     uint32_t val = (uint32_t) getByte(cpu->memory, address);
@@ -304,7 +304,7 @@ void lh(CPU* cpu, Log* log, int rd, int rs1, int offset) {
     setReg(cpu, rd, val);
 }
 void lw(CPU* cpu, Log* log, int rd, int rs1, int offset) {
-    sprintf(log->disassembledInstruction, "lw %d,%d(%d)", rd, offset, rs1);
+    sprintf(log->disassembledInstruction, "lw x%d,%d(x%d)", rd, offset, rs1);
     
     int address = (int) getReg(cpu, rs1) + offset;
     uint32_t val = (uint32_t) getByte(cpu->memory, address);
@@ -315,7 +315,7 @@ void lw(CPU* cpu, Log* log, int rd, int rs1, int offset) {
     setReg(cpu, rd, val);
 }
 void lbu(CPU* cpu, Log* log, int rd, int rs1, int offset) {
-    sprintf(log->disassembledInstruction, "lbu %d,%d(%d)", rd, offset, rs1);
+    sprintf(log->disassembledInstruction, "lbu x%d,%d(x%d)", rd, offset, rs1);
     
     int address = (int) getReg(cpu, rs1) + offset;
     uint32_t val = (uint32_t) getByte(cpu->memory, address);
@@ -323,7 +323,7 @@ void lbu(CPU* cpu, Log* log, int rd, int rs1, int offset) {
     setReg(cpu, rd, val);
 }
 void lhu(CPU* cpu, Log* log, int rd, int rs1, int offset) {
-    sprintf(log->disassembledInstruction, "lhu %d,%d(%d)", rd, offset, rs1);
+    sprintf(log->disassembledInstruction, "lhu x%d,%d(x%d)", rd, offset, rs1);
     
     int address = (int) getReg(cpu, rs1) + offset;
     uint32_t val = (uint32_t) getByte(cpu->memory, address);
@@ -333,7 +333,7 @@ void lhu(CPU* cpu, Log* log, int rd, int rs1, int offset) {
 }
 
 void sb(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
-    sprintf(log->disassembledInstruction, "sb %d,%d(%d)", rs2, offset, rs1);
+    sprintf(log->disassembledInstruction, "sb x%d,%d(x%d)", rs2, offset, rs1);
 
     int address = (int) getReg(cpu, rs1) + offset;
     uint8_t val = (uint8_t) getReg(cpu, rs2) & 0b11111111;
@@ -341,7 +341,7 @@ void sb(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
     insertByte(cpu->memory, address, val);
 }
 void sh(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
-    sprintf(log->disassembledInstruction, "sh %d,%d(%d)", rs2, offset, rs1);
+    sprintf(log->disassembledInstruction, "sh x%d,%d(x%d)", rs2, offset, rs1);
 
     int address = (int) getReg(cpu, rs1) + offset;
     uint32_t reg = getReg(cpu, rs2);
@@ -353,7 +353,7 @@ void sh(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
 }
 
 void sw(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
-    sprintf(log->disassembledInstruction, "sw %d,%d(%d)", rs2, offset, rs1);
+    sprintf(log->disassembledInstruction, "sw x%d,%d(x%d)", rs2, offset, rs1);
 
     int address = (int) getReg(cpu, rs1) + offset;
     uint32_t reg = getReg(cpu, rs2);

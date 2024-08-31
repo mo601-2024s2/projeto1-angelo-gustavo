@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
         read_elf(argv[1], &size, instruction_memory);
 
-        printf("%ld", size);
+        printf("\n%ld\n\n", size);
 
         runProgram(instruction_memory, size);
     } else {
