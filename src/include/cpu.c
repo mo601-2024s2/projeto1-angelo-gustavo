@@ -36,6 +36,14 @@ void freeCPU(CPU* cpu) {
     free(cpu);
 }
 
+int32_t imm_sig_extension(int imm) {
+    if (imm & 0x800) {  // Check if the sign bit (bit 11) is set
+        imm |= 0xFFFFF000;  // Set the upper 20 bits to 1 for negative numbers
+    }
+
+    return imm;
+}
+
 void runProgram(uint32_t program[], int programSize) {
     CPU* cpu = createCPU();
 
@@ -78,34 +86,34 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
         case 0x13: // 00100 11 - addi, slti, xori, ori, andi, alli, srli, srai
             switch (funct3) {
                 case 0X0: // 000 - addi
-                    addi(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    addi(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X2: // 010 - slti
-                    slti(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    slti(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X3: // 011 - sltiu
-                    sltiu(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    sltiu(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X4: // 100 - xori
-                    xori(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    xori(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X6: // 110 - ori
-                    ori(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    ori(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X7: // 111 - andi
-                    andi(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    andi(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X1: // 001 - slli
-                    slli(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    slli(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X5: // 101 - srli, srai
                     int effectiveFunct7 = (instruction >> 27) && 0x1F;
                     switch (effectiveFunct7) {
                         case 0x0: // 00000 - srli
-                            srli(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                            srli(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                             break;
                         case 0x8: // 01000 - srai
-                            srai(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                            srai(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                             break;
                     }
                     break;
