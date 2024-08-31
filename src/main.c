@@ -7,18 +7,23 @@
 
 
 
-int main() {
+int main(int argc, char *argv[]) {
     // Tells how many instructions the program has.
     long int size = 0;
     unsigned int* instruction_memory = malloc(4096*sizeof(unsigned int *));
 
-    read_elf("../test/ACStone/000.main.riscv", &size, instruction_memory);
 
-    printf("%ld", size);
+    if(argc == 2) {
+        printf("Programa %s", argv[1]);
 
-    printf("\n%08x\n", instruction_memory[0]);
+        read_elf(argv[1], &size, instruction_memory);
 
-    runProgram(instruction_memory, size);
+        printf("%ld", size);
+
+        runProgram(instruction_memory, size);
+    } else {
+        printf("Número de argumentos incorreto, por favor insira somente 1 path de programa para ser executado.\n");
+    }
 
     return 0;
 }

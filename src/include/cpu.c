@@ -58,9 +58,9 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
     int rs1 = (instruction >> 15) & 0b11111;
     int rs2 = (instruction >> 19) & 0b11111;
 
-    log->rs1 = getByte(cpu->memory, getReg(cpu, rs1));
+    log->rs1 = getReg(cpu, rs1);
     // printf("%d\n", rs2);
-    // log->rs2 = getByte(cpu->memory, getReg(cpu, rs2));
+    log->rs2 = getReg(cpu, rs2);
 
     int opcode = instruction & 0x7F;
     int funct3 = (instruction >> 12) & 0x7;
@@ -339,7 +339,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             break;
     }
 
-    log->rd = getByte(cpu->memory, getReg(cpu, rd));
+    log->rd = getReg(cpu, rd);
 
     printLog(log);
     freeLog(log);
