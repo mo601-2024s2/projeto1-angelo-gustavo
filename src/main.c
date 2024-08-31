@@ -12,11 +12,11 @@ int main() {
     long int size = 0;
     unsigned int* instruction_memory = malloc(4096*sizeof(unsigned int *));
 
-    read_elf("../test/000.main.riscv", &size, instruction_memory);
+    read_elf("../test/ACStone/000.main.riscv", &size, instruction_memory);
 
     printf("%ld", size);
 
-    printf("\n%08x\n", instruction_memory[13]);
+    printf("\n%08x\n", instruction_memory[0]);
 
     runProgram(instruction_memory, size);
 

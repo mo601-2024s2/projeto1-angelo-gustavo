@@ -59,7 +59,8 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
     int rs2 = (instruction >> 19) & 0b11111;
 
     log->rs1 = getByte(cpu->memory, getReg(cpu, rs1));
-    log->rs2 = getByte(cpu->memory, getReg(cpu, rs2));
+    // printf("%d\n", rs2);
+    // log->rs2 = getByte(cpu->memory, getReg(cpu, rs2));
 
     int opcode = instruction & 0x7F;
     int funct3 = (instruction >> 12) & 0x7;
@@ -161,7 +162,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             xorOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - div
-                            divOp(cpu, log, rd, rs1, rs2);
+                            opDiv(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;

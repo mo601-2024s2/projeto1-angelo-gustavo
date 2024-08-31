@@ -3,7 +3,8 @@
 #include "instructions.h"
 
 void lui(CPU* cpu, Log* log, int rd, int imm) {
-    sprintf(log->disassembledInstruction, "lui %d,%d", rd, imm);
+    sprintf(log->disassembledInstruction, "lui x%d,%d", rd, imm);
+
 
     uint32_t val = imm << 12;
 
@@ -11,7 +12,7 @@ void lui(CPU* cpu, Log* log, int rd, int imm) {
 }
 
 void auipc(CPU* cpu, Log* log, int rd, int imm) {
-    sprintf(log->disassembledInstruction, "auipc %d,%d", rd, imm);
+    sprintf(log->disassembledInstruction, "auipc x%d,%d", rd, imm);
 
     uint32_t val = cpu->pc + (imm << 12);
 
@@ -19,7 +20,7 @@ void auipc(CPU* cpu, Log* log, int rd, int imm) {
 }
 
 void addi(CPU* cpu, Log* log, int rd, int rs1, int imm) {
-    sprintf(log->disassembledInstruction, "addi %d,%d,%d", rd, rs1, imm);
+    sprintf(log->disassembledInstruction, "addi x%d,x%d,%d", rd, rs1, imm);
 
     uint32_t val = (int) getReg(cpu, rs1) + (int) (imm);
 
@@ -27,7 +28,7 @@ void addi(CPU* cpu, Log* log, int rd, int rs1, int imm) {
 }
 
 void slti(CPU* cpu, Log* log, int rd, int rs1, int imm) {
-    sprintf(log->disassembledInstruction, "slti %d,%d,%d", rd, rs1, imm);
+    sprintf(log->disassembledInstruction, "slti x%d,x%d,%d", rd, rs1, imm);
 
     uint32_t val = (int) getReg(cpu, rs1) < (int) (imm);
 
@@ -35,7 +36,7 @@ void slti(CPU* cpu, Log* log, int rd, int rs1, int imm) {
 }
 
 void sltiu(CPU* cpu, Log* log, int rd, int rs1, int imm) {
-    sprintf(log->disassembledInstruction, "sltiu %d,%d,%d", rd, rs1, imm);
+    sprintf(log->disassembledInstruction, "sltiu x%d,x%d,%d", rd, rs1, imm);
 
     uint32_t val = (uint32_t) getReg(cpu, rs1) < (uint32_t) (imm);
 
@@ -43,7 +44,7 @@ void sltiu(CPU* cpu, Log* log, int rd, int rs1, int imm) {
 }
 
 void xori(CPU* cpu, Log* log, int rd, int rs1, int imm) {
-    sprintf(log->disassembledInstruction, "xori %d,%d,%d", rd, rs1, imm);
+    sprintf(log->disassembledInstruction, "xori x%d,x%d,%d", rd, rs1, imm);
 
     uint32_t val = (int) getReg(cpu, rs1) ^ (int) (imm);
 
@@ -51,7 +52,7 @@ void xori(CPU* cpu, Log* log, int rd, int rs1, int imm) {
 }
 
 void ori(CPU* cpu, Log* log, int rd, int rs1, int imm) {
-    sprintf(log->disassembledInstruction, "ori %d,%d,%d", rd, rs1, imm);
+    sprintf(log->disassembledInstruction, "ori x%d,x%d,%d", rd, rs1, imm);
 
     uint32_t val = (int) getReg(cpu, rs1) | (int) (imm);
 
@@ -59,7 +60,7 @@ void ori(CPU* cpu, Log* log, int rd, int rs1, int imm) {
 }
 
 void andi(CPU* cpu, Log* log, int rd, int rs1, int imm) {
-    sprintf(log->disassembledInstruction, "andi %d,%d,%d", rd, rs1, imm);
+    sprintf(log->disassembledInstruction, "andi x%d,x%d,%d", rd, rs1, imm);
 
     uint32_t val = (int) getReg(cpu, rs1) & (int) (imm);
 
@@ -67,7 +68,7 @@ void andi(CPU* cpu, Log* log, int rd, int rs1, int imm) {
 }
 
 void slli(CPU* cpu, Log* log, int rd, int rs1, int shamt) {
-    sprintf(log->disassembledInstruction, "slli %d,%d,%d", rd, rs1, shamt);
+    sprintf(log->disassembledInstruction, "slli x%d,x%d,%d", rd, rs1, shamt);
 
     uint32_t val = (int) getReg(cpu, rs1) << (shamt);
 
@@ -75,7 +76,7 @@ void slli(CPU* cpu, Log* log, int rd, int rs1, int shamt) {
 }
 
 void srli(CPU* cpu, Log* log, int rd, int rs1, int shamt) {
-    sprintf(log->disassembledInstruction, "srli %d,%d,%d", rd, rs1, shamt);
+    sprintf(log->disassembledInstruction, "srli x%d,x%d,%d", rd, rs1, shamt);
 
     // aparentemente pra o shift direito ser lógico tem q ser unsigned
     uint32_t val = (uint32_t) getReg(cpu, rs1) >> (shamt);
@@ -84,7 +85,7 @@ void srli(CPU* cpu, Log* log, int rd, int rs1, int shamt) {
 }
 
 void srai(CPU* cpu, Log* log, int rd, int rs1, int shamt) {
-    sprintf(log->disassembledInstruction, "srai %d,%d,%d", rd, rs1, shamt);
+    sprintf(log->disassembledInstruction, "srai x%d,x%d,%d", rd, rs1, shamt);
 
     uint32_t val = (int) getReg(cpu, rs1) >> (shamt);
 
@@ -92,7 +93,7 @@ void srai(CPU* cpu, Log* log, int rd, int rs1, int shamt) {
 }
 
 void add(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
-    sprintf(log->disassembledInstruction, "add %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "add x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (int) getReg(cpu, rs1) + (int) getReg(cpu, rs2);
 
@@ -100,7 +101,7 @@ void add(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
 }
 
 void sub(CPU* cpu, Log* log, int rd, int rs1, int rs2){
-    sprintf(log->disassembledInstruction, "sub %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "sub x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (int) getReg(cpu, rs1) - (int) getReg(cpu, rs2);
 
@@ -108,7 +109,7 @@ void sub(CPU* cpu, Log* log, int rd, int rs1, int rs2){
 }
 
 void sll(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
-    sprintf(log->disassembledInstruction, "sll %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "sll x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (int) getReg(cpu, rs1) << (int) getReg(cpu, rs2);
 
@@ -116,7 +117,7 @@ void sll(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
 }
 
 void slt(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
-    sprintf(log->disassembledInstruction, "slt %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "slt x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (int) getReg(cpu, rs1) < (int) getReg(cpu, rs2);
 
@@ -124,7 +125,7 @@ void slt(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
 }
 
 void sltu(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
-    sprintf(log->disassembledInstruction, "sltu %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "sltu x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (uint32_t) getReg(cpu, rs1) < (uint32_t) getReg(cpu, rs2);
 
@@ -132,7 +133,7 @@ void sltu(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
 }
 
 void xorOp(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
-    sprintf(log->disassembledInstruction, "xor %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "xor x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (int) getReg(cpu, rs1) ^ (int) getReg(cpu, rs2);
 
@@ -140,7 +141,7 @@ void xorOp(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
 }
 
 void srl(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
-    sprintf(log->disassembledInstruction, "srl %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "srl x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (uint32_t) getReg(cpu, rs1) >> (uint32_t) getReg(cpu, rs2);
 
@@ -148,7 +149,7 @@ void srl(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
 }
 
 void sra(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
-    sprintf(log->disassembledInstruction, "sra %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "sra x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (int) getReg(cpu, rs1) >> (int) getReg(cpu, rs2);
 
@@ -156,7 +157,7 @@ void sra(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
 }
 
 void orOp(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
-    sprintf(log->disassembledInstruction, "or %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "or x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (int) getReg(cpu, rs1) | (int) getReg(cpu, rs2);
 
@@ -164,7 +165,7 @@ void orOp(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
 }
 
 void andOp(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
-    sprintf(log->disassembledInstruction, "and %d,%d,%d", rd, rs1, rs2);
+    sprintf(log->disassembledInstruction, "and x%d,x%d,x%d", rd, rs1, rs2);
 
     uint32_t val = (int) getReg(cpu, rs1) & (int) getReg(cpu, rs2);
 
@@ -183,7 +184,7 @@ void fenceI(CPU* cpu, Log* log) {
 
 // Ao que tudo indica precisa de um outro registrador especial na CPU pra todas as instruções de csr
 void csrrw(CPU* cpu, Log* log, int rd, int rs1, int csr) {
-    sprintf(log->disassembledInstruction, "csrrw %d,%d,%d", rd, rs1, csr);
+    sprintf(log->disassembledInstruction, "csrrw x%d,x%d,%d", rd, rs1, csr);
 
     uint32_t val = (int) csr;
 
@@ -192,7 +193,7 @@ void csrrw(CPU* cpu, Log* log, int rd, int rs1, int csr) {
 }
 
 void csrrs(CPU* cpu, Log* log, int rd, int rs1, int csr) {
-    sprintf(log->disassembledInstruction, "csrrs %d,%d,%d", rd, rs1, csr);
+    sprintf(log->disassembledInstruction, "csrrs x%d,x%d,x%d", rd, rs1, csr);
 
     uint32_t val = (int) csr;
     setReg(cpu, rd, val);
@@ -203,7 +204,7 @@ void csrrs(CPU* cpu, Log* log, int rd, int rs1, int csr) {
 }
 
 void csrrc(CPU* cpu, Log* log, int rd, int rs1, int csr) {
-    sprintf(log->disassembledInstruction, "csrrc %d,%d,%d", rd, rs1, csr);
+    sprintf(log->disassembledInstruction, "csrrc x%d,x%d,%d", rd, rs1, csr);
 
     uint32_t val = (int) csr;
     setReg(cpu, rd, val);
@@ -214,7 +215,7 @@ void csrrc(CPU* cpu, Log* log, int rd, int rs1, int csr) {
 }
 
 void csrrwi(CPU* cpu, Log* log, int rd, int uimm, int csr) {
-    sprintf(log->disassembledInstruction, "csrrwi %d,%d,%d", rd, uimm, csr);
+    sprintf(log->disassembledInstruction, "csrrwi x%d,%d,%d", rd, uimm, csr);
 
     uint32_t val = (int) csr;
     setReg(cpu, rd, val);
@@ -225,7 +226,7 @@ void csrrwi(CPU* cpu, Log* log, int rd, int uimm, int csr) {
 }
 
 void csrrsi(CPU* cpu, Log* log, int rd, int uimm, int csr) {
-    sprintf(log->disassembledInstruction, "csrrsi %d,%d,%d", rd, uimm, csr);
+    sprintf(log->disassembledInstruction, "csrrsi x%d,%d,%d", rd, uimm, csr);
 
     uint32_t val = (int) csr;
     setReg(cpu, rd, val);
@@ -235,7 +236,7 @@ void csrrsi(CPU* cpu, Log* log, int rd, int uimm, int csr) {
     cpu->csr = val;
 }
 void csrrci(CPU* cpu, Log* log, int rd, int uimm, int csr) {
-    sprintf(log->disassembledInstruction, "csrrci %d,%d,%d", rd, uimm, csr);
+    sprintf(log->disassembledInstruction, "csrrci x%d,%d,%d", rd, uimm, csr);
 
     uint32_t val = (int) csr;
     setReg(cpu, rd, val);
@@ -368,13 +369,13 @@ void sw(CPU* cpu, Log* log, int rs1, int rs2, int offset) {
 }
 
 void jal(CPU* cpu, Log* log, int rd, int offset) {
-    sprintf(log, "jal x%d,%d", rd, offset);
+    sprintf(log->disassembledInstruction, "jal x%d,%d", rd, offset);
 
     setReg(cpu, rd, cpu->pc + 4);
     cpu->pc += offset - 4;
 }
 void jalr(CPU* cpu, Log* log, int rd, int rs1, int offset) {
-    sprintf(log, "jalr x%d,x%d,%d", rd, rs1, offset);
+    sprintf(log->disassembledInstruction, "jalr x%d,x%d,%d", rd, rs1, offset);
 
     int t = cpu->pc + 4;
     cpu->pc = (getReg(cpu, rs1) + offset) & ~1;
@@ -428,17 +429,17 @@ void mul(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
 void mulh(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
     set3RLog(log, "mulh", rd, rs1, rs2);
 
-    setReg(cpu, rd, ((int) getReg(cpu, rs1) * (int) getReg(cpu, rs2)) >> 32);
+    setReg(cpu, rd, ((int) getReg(cpu, rs1) * (long) getReg(cpu, rs2)) >> 32);
 }
 void mulhsu(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
     set3RLog(log, "mulhsu", rd, rs1, rs2);
 
-    setReg(cpu, rd, ((int) getReg(cpu, rs1) * getReg(cpu, rs2)) >> 32);
+    setReg(cpu, rd, ((int) getReg(cpu, rs1) * (long) getReg(cpu, rs2)) >> 32);
 }
 void mulhu(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
     set3RLog(log, "mulhu", rd, rs1, rs2);
 
-    setReg(cpu, rd, (getReg(cpu, rs1) * getReg(cpu, rs2)) >> 32);
+    setReg(cpu, rd, (getReg(cpu, rs1) * (long) getReg(cpu, rs2)) >> 32);
 }
 void opDiv(CPU* cpu, Log* log, int rd, int rs1, int rs2) {
     set3RLog(log, "div", rd, rs1, rs2);
