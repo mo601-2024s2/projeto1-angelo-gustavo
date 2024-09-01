@@ -14,11 +14,11 @@ int main(int argc, char *argv[]) {
 
 
     if(argc == 2) {
-        printf("Programa %s", argv[1]);
+        printf("Programa %s\n", argv[1]);
 
         read_elf(argv[1], &size, instruction_memory);
 
-        printf("\n%ld\n\n", size);
+        printf("\nNúmero de instruções do programa: %ld\n\n", size);
 
         runProgram(instruction_memory, size);
     } else {
