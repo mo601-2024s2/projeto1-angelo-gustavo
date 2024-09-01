@@ -64,7 +64,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
     
     int rd = (instruction >> 7) & 0b11111;
     int rs1 = (instruction >> 15) & 0b11111;
-    int rs2 = (instruction >> 19) & 0b11111;
+    int rs2 = (instruction >> 20) & 0b11111;
 
     log->rs1 = getReg(cpu, rs1);
     // printf("%d\n", rs2);
@@ -272,7 +272,8 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             }
             break;
         case 0x3: // 00000 11 - lb, lh, lw, lbu, lhu
-            offset = (instruction >> 20) && 0b111111111111;
+            offset = (instruction >> 20) & 0b111111111111;
+            offset = imm_sig_extension(offset); // teoricamente são iguais
             switch (funct3) {
                 case 0x0: // 000 - lb
                     lb(cpu, log, rd, rs1, offset);
@@ -292,8 +293,9 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             }
             break;
         case 0x23: // 01000 11 - sb, sh, sw
-            offset = (instruction >> 25);                                   // 11:5
-            offset = ((offset << 7) + (instruction >> 7)) & 0b11111;         // 4:0
+            offset = (instruction >> 25) & 0x7F;                        // 11:5
+            offset = (offset << 5) | ((instruction >> 7) & 0x1F);         // 4:0
+            offset = imm_sig_extension(offset);
             switch (funct3) {
                 case 0x0: // 000 - sb
                     sb(cpu, log, rs1, rs2, offset);
