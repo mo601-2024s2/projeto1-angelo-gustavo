@@ -5,7 +5,6 @@
 void lui(CPU* cpu, Log* log, int rd, int imm) {
     sprintf(log->disassembledInstruction, "lui x%d,%d", rd, imm);
 
-
     uint32_t val = imm << 12;
 
     setReg(cpu, rd, val);
@@ -22,7 +21,7 @@ void auipc(CPU* cpu, Log* log, int rd, int imm) {
 void addi(CPU* cpu, Log* log, int rd, int rs1, int imm) {
     sprintf(log->disassembledInstruction, "addi x%d,x%d,%d", rd, rs1, imm);
 
-    uint32_t val = (int) getReg(cpu, rs1) + (int) (imm);
+    int32_t val = (int) getReg(cpu, rs1) + (int) (imm);
 
     setReg(cpu, rd, val);
 }

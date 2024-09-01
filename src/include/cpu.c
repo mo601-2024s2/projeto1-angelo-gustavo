@@ -293,7 +293,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             break;
         case 0x23: // 01000 11 - sb, sh, sw
             offset = (instruction >> 25);                                   // 11:5
-            offset = (offset << 7) + (instruction >> 7) && 0b11111;         // 4:0
+            offset = ((offset << 7) + (instruction >> 7)) & 0b11111;         // 4:0
             switch (funct3) {
                 case 0x0: // 000 - sb
                     sb(cpu, log, rs1, rs2, offset);

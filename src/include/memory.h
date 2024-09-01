@@ -2,7 +2,7 @@
     Responsible for memory operations
 */
 
-#define DRAM_SIZE 1024
+#define DRAM_SIZE 6242880
 
 #include <stdint.h>
 
