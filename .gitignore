@@ -54,3 +54,4 @@ dkms.conf
 .vscode
 *.dump
 *.riscv
+*.log
