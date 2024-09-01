@@ -314,10 +314,12 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             offset = (offset << 1) + ((instruction >> 20) & 0b1);           // 11
             offset = (offset << 10) + ((instruction >> 21) & 0b1111111111); // 1:10
             offset = offset << 1;                                           // 0
+            offset = imm_sig_extension(offset);
             jal(cpu, log, rd, offset);
             break;
         case 0x67: // 11001 11 - jalr
             offset = instruction >> 20;                                     // 0:11
+            offset = imm_sig_extension(offset);
             jalr(cpu, log, rd, rs1, offset);
             break;
         case 0x63: // 11000 11 - beq, bne, blt, bge, bltu, bgeu
@@ -326,6 +328,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             offset = (offset << 6) + ((instruction >> 25) & 0b111111);      // 5:10
             offset = (offset << 4) + ((instruction >> 8) & 0b1111);         // 1:4
             offset = offset << 1;                                           // 0
+            offset = imm_sig_extension(offset);
             switch (funct3) {
                 case 0x0: // 000 - beq
                     beq(cpu, log, rs1, rs2, offset);
