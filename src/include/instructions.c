@@ -378,6 +378,7 @@ void jalr(CPU* cpu, Log* log, int rd, int rs1, int offset) {
 
     int t = cpu->pc + 4;
     cpu->pc = (getReg(cpu, rs1) + offset) & ~1;
+    cpu->pc -= 4;
     setReg(cpu, rd, t);
 }
 
