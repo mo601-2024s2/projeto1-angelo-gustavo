@@ -13,8 +13,9 @@ Log* createLog() {
     return log;
 }
 
-void printLog(Log* log) {
+void printLog(Log* log, FILE* file) {
     printf("%s [%X] - PC:0x%X rs1:0x%X rs2:0x%X rd:0x%X\n", log->disassembledInstruction, log->instruction, log->pc, log->rs1, log->rs2, log->rd);
+    fprintf(file, "%s [%X] - PC:0x%X rs1:0x%X rs2:0x%X rd:0x%X\n", log->disassembledInstruction, log->instruction, log->pc, log->rs1, log->rs2, log->rd);
 }
 
 void freeLog(Log* log) {

@@ -44,19 +44,26 @@ int32_t imm_sig_extension(int imm) {
     return imm;
 }
 
-void runProgram(uint32_t program[], int programSize) {
+void runProgram(uint32_t program[], int programSize, char* logfile) {
     CPU* cpu = createCPU();
+    FILE *fptr;
+    fptr = fopen(logfile, "w");
+    fclose(fptr);
+
+    fptr = fopen(logfile, "a");
 
     while (cpu->pc / 4 < programSize) {
-        runInstruction(program[cpu->pc / 4], cpu);
+        runInstruction(program[cpu->pc / 4], cpu, fptr);
         cpu->pc += 4;
     }
+
+    fclose(fptr);
 
     freeCPU(cpu);
 }
 
 
-void runInstruction(uint32_t instruction, CPU* cpu) {
+void runInstruction(uint32_t instruction, CPU* cpu, FILE* file) {
     Log* log = createLog();
 
     log->instruction = instruction;
@@ -354,6 +361,6 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
 
     log->rd = getReg(cpu, rd);
 
-    printLog(log);
+    printLog(log, file);
     freeLog(log);
 }

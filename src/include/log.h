@@ -12,6 +12,7 @@
 #define LOG_H
 
 #include <stdint.h>
+#include <stdio.h>
 #define MAX_INST_SIZE 64
 
 typedef struct {
@@ -24,7 +25,7 @@ typedef struct {
 } Log;
 
 Log* createLog();
-void printLog(Log* log);
+void printLog(Log* log, FILE* file);
 void freeLog(Log* log);
 
 #endif
