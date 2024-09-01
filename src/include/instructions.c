@@ -2,6 +2,23 @@
 #include <stdlib.h>
 #include "instructions.h"
 
+
+// Support functions
+int32_t sign_extend(int32_t value, int bit_width) {
+    // Calculate the sign bit position
+    int32_t sign_bit = 1 << (bit_width - 1);
+
+    // If the sign bit is set, extend the sign
+    if (value & sign_bit) {
+        value |= ~((1 << bit_width) - 1);  // Set the upper bits to 1
+    } else {
+        value &= (1 << bit_width) - 1;  // Clear the upper bits
+    }
+    return value;
+}
+
+
+// Instructions to simulate
 void lui(CPU* cpu, Log* log, int rd, int imm) {
     sprintf(log->disassembledInstruction, "lui x%d,%d", rd, imm);
 
