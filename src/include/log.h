@@ -25,7 +25,7 @@ typedef struct {
 } Log;
 
 Log* createLog();
-void printLog(Log* log, FILE* file);
+void printLog(Log* log, int rd, int rs1, int rs2, FILE* file);
 void freeLog(Log* log);
 
 #endif

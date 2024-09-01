@@ -361,6 +361,6 @@ void runInstruction(uint32_t instruction, CPU* cpu, FILE* file) {
 
     log->rd = getReg(cpu, rd);
 
-    printLog(log, file);
+    printLog(log, rd, rs1, rs2, file);
     freeLog(log);
 }
