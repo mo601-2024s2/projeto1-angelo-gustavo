@@ -293,8 +293,8 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             }
             break;
         case 0x23: // 01000 11 - sb, sh, sw
-            offset = (instruction >> 25) & 0x7F;                        // 11:5
-            offset = (offset << 5) | ((instruction >> 7) & 0x1F);         // 4:0
+            offset = (instruction >> 25) & 0x7F;                            // 11:5
+            offset = (offset << 5) | ((instruction >> 7) & 0x1F);           // 4:0
             offset = imm_sig_extension(offset);
             switch (funct3) {
                 case 0x0: // 000 - sb
@@ -310,9 +310,9 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             break;
         case 0x6F: // 11011 11 - jal
             offset = instruction >> 31;                                     // 20
-            offset = (offset << 1) + ((instruction >> 15) & 0b11111);       // 12:19
-            offset = (offset << 5) + ((instruction >> 20) & 0b1);           // 11
-            offset = (offset << 1) + ((instruction >> 21) & 0b1111111111);  // 1:10
+            offset = (offset << 8) + ((instruction >> 12) & 0b11111111);    // 12:19
+            offset = (offset << 1) + ((instruction >> 20) & 0b1);           // 11
+            offset = (offset << 10) + ((instruction >> 21) & 0b1111111111); // 1:10
             offset = offset << 1;                                           // 0
             jal(cpu, log, rd, offset);
             break;
@@ -323,8 +323,8 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
         case 0x63: // 11000 11 - beq, bne, blt, bge, bltu, bgeu
             offset = (instruction >> 31);                                   // 12
             offset = (offset << 1) + ((instruction >> 7) & 0b1);            // 11
-            offset = (offset << 1) + ((instruction >> 25) & 0b111111);      // 5:10
-            offset = (offset << 6) + ((instruction >> 8) & 0b1111);         // 1:4
+            offset = (offset << 6) + ((instruction >> 25) & 0b111111);      // 5:10
+            offset = (offset << 4) + ((instruction >> 8) & 0b1111);         // 1:4
             offset = offset << 1;                                           // 0
             switch (funct3) {
                 case 0x0: // 000 - beq
