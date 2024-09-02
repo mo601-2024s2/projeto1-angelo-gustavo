@@ -17,7 +17,7 @@ Este repositório contém o simulador escrito em C de RISC-V implementado como p
     └── ACStone
 ```
 
-A pasta src contém os arquivos de código bem como a Makefile necessária para compilar o projeto. A pasta test contém a benchmark ACStone bem como um .sh que permite que o seu código C seja compilado em arquivos hexadecimais executáveis no simulador.
+A pasta src contém os arquivos de código bem como a Makefile necessária para compilar o projeto. A pasta test contém a benchmark ACStone bem como um .sh que permite que os códigos de teste em C sejam compilados em arquivos binários executáveis(elf) no simulador.
 
 ## Requisitos
 
@@ -38,13 +38,13 @@ O código desenvolvido está dividido em uma série de módulos que se comportam
 
 | Nome do módulo | Função |
 |-|-|
-| `reader.c` | Leitura dos arquivos em hexadecimal e transformação em um formato mais legível |
+| `reader.c` | Leitura dos arquivos binários(elf) e adaptação em um formato para execução no simulador |
 | `log.c` | Geração e manipulação dos logs |
 | `instructions.c` | Implementação das instruções de tipo I e M do RISC-V |
 | `memory.c` | Geração e manipulação da DRAM |
 | `cpu.c` | Roda o programa instrução por instrução, incluindo o processo de decoficação |
 
-Dado um arquivo hexadecimal, `main.c` o interpreta por meio de `reader.c` e o roda por meio de `cpu.c`.
+Dado um arquivo binário(elf), `main.c` o interpreta por meio de `reader.c` e o roda por meio de `cpu.c`.
 
 ## Testagem
 
