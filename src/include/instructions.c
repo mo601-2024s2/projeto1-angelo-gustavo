@@ -338,8 +338,7 @@ void lb(CPU* cpu, Log* log, int rd, int rs1, int offset) {
     int address = (int) getReg(cpu, rs1) + offset;
     uint32_t val = (uint32_t) getByte(cpu->memory, address);
 
-    val = val || ((val << 24) & 0b10000000000000000000000000000000); // Sign extend
-    val = val & 0b11111111111111111111111101111111;
+    val = sign_extend(val, 8);
 
     setReg(cpu, rd, val);
 }
@@ -350,8 +349,7 @@ void lh(CPU* cpu, Log* log, int rd, int rs1, int offset) {
     uint32_t val = (uint32_t) getByte(cpu->memory, address);
     val = (val << 8) + (uint32_t) getByte(cpu->memory, address + 1);
 
-    val = val || ((val << 16) & 0b10000000000000000000000000000000); // Sign extend
-    val = val & 0b11111111111111110111111111111111;
+    val = sign_extend(val, 16);
 
     setReg(cpu, rd, val);
 }
