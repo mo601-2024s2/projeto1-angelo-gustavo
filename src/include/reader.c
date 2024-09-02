@@ -74,14 +74,14 @@ void read_elf(char* elf_file, long int* size, unsigned int* instruction_memory) 
                 fprintf(stderr, "Failed to read .text section\n");
                 exit(EXIT_FAILURE);
             }
-            printf("Data in .text section (grouped 4 bytes at a time):\n");
+            // printf("Data in .text section (grouped 4 bytes at a time):\n");
             // Each "word" is an instruction
             for (size_t i = 0; i < data->d_size; i += 4) {
                 // Handle cases where the remaining data is less than 4 bytes
                 unsigned int word = 0;
                 memcpy(&word, ((unsigned char *)data->d_buf) + i, (data->d_size - i) >= 4 ? 4 : (data->d_size - i));
-                printf("%08x ", word);
-                printf("\n");
+                // printf("%08x ", word);
+                // printf("\n");
 
                 instruction_memory[*size] = word;
 
