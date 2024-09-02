@@ -36,19 +36,34 @@ void freeCPU(CPU* cpu) {
     free(cpu);
 }
 
-void runProgram(uint32_t program[], int programSize) {
+int32_t imm_sig_extension(int imm) {
+    if (imm & 0x800) {  // Check if the sign bit (bit 11) is set
+        imm |= 0xFFFFF000;  // Set the upper 20 bits to 1 for negative numbers
+    }
+
+    return imm;
+}
+
+void runProgram(uint32_t program[], int programSize, char* logfile) {
     CPU* cpu = createCPU();
+    FILE *fptr;
+    fptr = fopen(logfile, "w");
+    fclose(fptr);
+
+    fptr = fopen(logfile, "a");
 
     while (cpu->pc / 4 < programSize) {
-        runInstruction(program[cpu->pc / 4], cpu);
+        runInstruction(program[cpu->pc / 4], cpu, fptr);
         cpu->pc += 4;
     }
+
+    fclose(fptr);
 
     freeCPU(cpu);
 }
 
 
-void runInstruction(uint32_t instruction, CPU* cpu) {
+void runInstruction(uint32_t instruction, CPU* cpu, FILE* file) {
     Log* log = createLog();
 
     log->instruction = instruction;
@@ -56,10 +71,11 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
     
     int rd = (instruction >> 7) & 0b11111;
     int rs1 = (instruction >> 15) & 0b11111;
-    int rs2 = (instruction >> 19) & 0b11111;
+    int rs2 = (instruction >> 20) & 0b11111;
 
-    log->rs1 = getByte(cpu->memory, getReg(cpu, rs1));
-    log->rs2 = getByte(cpu->memory, getReg(cpu, rs2));
+    log->rs1 = getReg(cpu, rs1);
+    // printf("%d\n", rs2);
+    log->rs2 = getReg(cpu, rs2);
 
     int opcode = instruction & 0x7F;
     int funct3 = (instruction >> 12) & 0x7;
@@ -77,34 +93,34 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
         case 0x13: // 00100 11 - addi, slti, xori, ori, andi, alli, srli, srai
             switch (funct3) {
                 case 0X0: // 000 - addi
-                    addi(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    addi(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X2: // 010 - slti
-                    slti(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    slti(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X3: // 011 - sltiu
-                    sltiu(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    sltiu(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X4: // 100 - xori
-                    xori(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    xori(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X6: // 110 - ori
-                    ori(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    ori(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X7: // 111 - andi
-                    andi(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    andi(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X1: // 001 - slli
-                    slli(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                    slli(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                     break;
                 case 0X5: // 101 - srli, srai
                     int effectiveFunct7 = (instruction >> 27) && 0x1F;
                     switch (effectiveFunct7) {
                         case 0x0: // 00000 - srli
-                            srli(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                            srli(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                             break;
                         case 0x8: // 01000 - srai
-                            srai(cpu, log, rd, rs1, (instruction >> 12) & 0xFFFFF);
+                            srai(cpu, log, rd, rs1, imm_sig_extension(instruction >> 20));
                             break;
                     }
                     break;
@@ -161,7 +177,7 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
                             xorOp(cpu, log, rd, rs1, rs2);
                             break;
                         case 0x1: // 00000 01 - div
-                            divOp(cpu, log, rd, rs1, rs2);
+                            opDiv(cpu, log, rd, rs1, rs2);
                             break;
                     }
                     break;
@@ -263,7 +279,8 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             }
             break;
         case 0x3: // 00000 11 - lb, lh, lw, lbu, lhu
-            offset = (instruction >> 20) && 0b111111111111;
+            offset = (instruction >> 20) & 0b111111111111;
+            offset = imm_sig_extension(offset); // teoricamente são iguais
             switch (funct3) {
                 case 0x0: // 000 - lb
                     lb(cpu, log, rd, rs1, offset);
@@ -283,8 +300,9 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             }
             break;
         case 0x23: // 01000 11 - sb, sh, sw
-            offset = (instruction >> 25);                                   // 11:5
-            offset = (offset << 7) + (instruction >> 7) && 0b11111;         // 4:0
+            offset = (instruction >> 25) & 0x7F;                            // 11:5
+            offset = (offset << 5) | ((instruction >> 7) & 0x1F);           // 4:0
+            offset = imm_sig_extension(offset);
             switch (funct3) {
                 case 0x0: // 000 - sb
                     sb(cpu, log, rs1, rs2, offset);
@@ -299,22 +317,25 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             break;
         case 0x6F: // 11011 11 - jal
             offset = instruction >> 31;                                     // 20
-            offset = (offset << 1) + ((instruction >> 15) & 0b11111);       // 12:19
-            offset = (offset << 5) + ((instruction >> 20) & 0b1);           // 11
-            offset = (offset << 1) + ((instruction >> 21) & 0b1111111111);  // 1:10
+            offset = (offset << 8) + ((instruction >> 12) & 0b11111111);    // 12:19
+            offset = (offset << 1) + ((instruction >> 20) & 0b1);           // 11
+            offset = (offset << 10) + ((instruction >> 21) & 0b1111111111); // 1:10
             offset = offset << 1;                                           // 0
+            offset = imm_sig_extension(offset);
             jal(cpu, log, rd, offset);
             break;
         case 0x67: // 11001 11 - jalr
             offset = instruction >> 20;                                     // 0:11
+            offset = imm_sig_extension(offset);
             jalr(cpu, log, rd, rs1, offset);
             break;
         case 0x63: // 11000 11 - beq, bne, blt, bge, bltu, bgeu
             offset = (instruction >> 31);                                   // 12
             offset = (offset << 1) + ((instruction >> 7) & 0b1);            // 11
-            offset = (offset << 1) + ((instruction >> 25) & 0b111111);      // 5:10
-            offset = (offset << 6) + ((instruction >> 8) & 0b1111);         // 1:4
+            offset = (offset << 6) + ((instruction >> 25) & 0b111111);      // 5:10
+            offset = (offset << 4) + ((instruction >> 8) & 0b1111);         // 1:4
             offset = offset << 1;                                           // 0
+            offset = imm_sig_extension(offset);
             switch (funct3) {
                 case 0x0: // 000 - beq
                     beq(cpu, log, rs1, rs2, offset);
@@ -338,8 +359,8 @@ void runInstruction(uint32_t instruction, CPU* cpu) {
             break;
     }
 
-    log->rd = getByte(cpu->memory, getReg(cpu, rd));
+    log->rd = getReg(cpu, rd);
 
-    printLog(log);
+    printLog(log, rd, rs1, rs2, file);
     freeLog(log);
 }

@@ -51,4 +51,7 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-/.vscode
+.vscode
+*.dump
+*.riscv
+*.log
